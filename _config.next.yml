@@ -2,10 +2,10 @@
 # Menu Configuration
 # ---------------------------------------------------------------
 menu:
-  home: /blog/ || fa fa-home
-  archives: /blog/archives/ || fa fa-archive
-  categories: /blog/categories/ || fa fa-th
-  tags: /blog/tags/ || fa fa-tags
+  home: /ai-blog/ || fa fa-home
+  archives: /ai-blog/archives/ || fa fa-archive
+  categories: /ai-blog/categories/ || fa fa-th
+  tags: /ai-blog/tags/ || fa fa-tags
 
 # Enable / Disable menu icons / item badges.
 menu_settings:
