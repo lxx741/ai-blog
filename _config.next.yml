@@ -1,0 +1,83 @@
+# ---------------------------------------------------------------
+# Menu Configuration
+# ---------------------------------------------------------------
+menu:
+  home: /blog/ || fa fa-home
+  archives: /blog/archives/ || fa fa-archive
+  categories: /blog/categories/ || fa fa-th
+  tags: /blog/tags/ || fa fa-tags
+
+# Enable / Disable menu icons / item badges.
+menu_settings:
+  icons: true
+  badges: false
+
+# ---------------------------------------------------------------
+# SEO Settings
+# ---------------------------------------------------------------
+seo: true
+
+# ---------------------------------------------------------------
+# Sidebar Settings
+# ---------------------------------------------------------------
+sidebar:
+  position: left
+  width: 320
+  padding: 18
+
+# Sidebar Avatar
+avatar:
+  enabled: false
+
+# Table of Contents
+toc:
+  enabled: true
+  number: true
+  expand_all: false
+  max_depth: 6
+
+# ---------------------------------------------------------------
+# Footer Settings
+# ---------------------------------------------------------------
+footer:
+  enabled: true
+  since: 2026
+  copyrighted: true
+  powered: true
+
+# ---------------------------------------------------------------
+# Post Settings
+# ---------------------------------------------------------------
+post:
+  edit_link: false
+  copyright:
+    enable: true
+    decode: false
+    author:
+      enable: true
+    link:
+      enable: true
+    license:
+      enable: true
+      url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+# ---------------------------------------------------------------
+# Comments Settings
+# ---------------------------------------------------------------
+comments:
+  enable: false
+
+# ---------------------------------------------------------------
+# Third Party Services
+# ---------------------------------------------------------------
+# Math
+math:
+  enable: false
+
+# Search
+local_search:
+  enable: true
+
+# Analytics
+analytics:
+  enable: false
