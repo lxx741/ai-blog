@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/ai-blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/ai-blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/ai-blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/ai-blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/ai-blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lxx741.github.io","root":"/ai-blog/","images":"/ai-blog/images","scheme":"Muse","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12,"width":320},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null,"enable":false},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/ai-blog/js/config.js" defer></script>
+
+    <meta name="description" content="摘要：本文系统讲解 AI Agent 智能体的核心架构，包括 LLM 大模型、记忆模块、RAG、MCP、Tools、Skills、ReAct 等关键组件，并通过实战案例串联所有概念，帮助开发者快速掌握智能体开发要点。   一、什么是 AI Agent？AI Agent（智能体）是一个能够感知环境、进行推理、做出决策并执行行动的自主系统。它不仅仅是被动回答问题的聊天机器人，而是能够主动完成任务的智">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Agent 智能体架构详解：从概念到实战">
+<meta property="og:url" content="https://lxx741.github.io/ai-blog/2026/03/10/AI%20Agent%20%E6%99%BA%E8%83%BD%E4%BD%93%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="未完待续">
+<meta property="og:description" content="摘要：本文系统讲解 AI Agent 智能体的核心架构，包括 LLM 大模型、记忆模块、RAG、MCP、Tools、Skills、ReAct 等关键组件，并通过实战案例串联所有概念，帮助开发者快速掌握智能体开发要点。   一、什么是 AI Agent？AI Agent（智能体）是一个能够感知环境、进行推理、做出决策并执行行动的自主系统。它不仅仅是被动回答问题的聊天机器人，而是能够主动完成任务的智">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-10T09:30:00.000Z">
+<meta property="article:modified_time" content="2026-03-17T11:23:26.872Z">
+<meta property="article:author" content="未完待续">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="ReAct">
+<meta property="article:tag" content="人工智能，LLM">
+<meta property="article:tag" content="智能体">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lxx741.github.io/ai-blog/2026/03/10/AI%20Agent%20%E6%99%BA%E8%83%BD%E4%BD%93%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lxx741.github.io/ai-blog/2026/03/10/AI%20Agent%20%E6%99%BA%E8%83%BD%E4%BD%93%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3/","path":"2026/03/10/AI Agent 智能体架构详解/","title":"AI Agent 智能体架构详解：从概念到实战"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>AI Agent 智能体架构详解：从概念到实战 | 未完待续</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/ai-blog/js/utils.js" defer></script><script src="/ai-blog/js/motion.js" defer></script><script src="/ai-blog/js/sidebar.js" defer></script><script src="/ai-blog/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/ai-blog/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/ai-blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/ai-blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">未完待续</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录生活与技术</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/ai-blog/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/ai-blog/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-categories"><a href="/ai-blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-tags"><a href="/ai-blog/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AF-AI-Agent%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">一、什么是 AI Agent？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">核心架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">二、核心组件详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-LLM-%E5%A4%A7%E6%A8%A1%E5%9E%8B%EF%BC%88%E5%A4%A7%E8%84%91%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 LLM 大模型（大脑）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E8%AE%B0%E5%BF%86%E6%A8%A1%E5%9D%97%EF%BC%88%E7%BB%8F%E9%AA%8C%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 记忆模块（经验）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-RAG-%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90%EF%BC%88%E7%9F%A5%E8%AF%86%E5%BA%93%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 RAG 检索增强生成（知识库）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-MCP-%E6%A8%A1%E5%9E%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8D%8F%E8%AE%AE%EF%BC%88%E8%BF%9E%E6%8E%A5%E5%99%A8%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 MCP 模型上下文协议（连接器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-Tools-%E5%B7%A5%E5%85%B7%EF%BC%88%E5%8E%9F%E5%AD%90%E8%83%BD%E5%8A%9B%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 Tools 工具（原子能力）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-Skills-%E6%8A%80%E8%83%BD%EF%BC%88%E5%A4%8D%E5%90%88%E8%83%BD%E5%8A%9B%EF%BC%89"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 Skills 技能（复合能力）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-ReAct-%E6%8E%A8%E7%90%86%E4%B8%8E%E8%A1%8C%E5%8A%A8%EF%BC%88%E5%86%B3%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%89"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 ReAct 推理与行动（决策引擎）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B%EF%BC%9A%E6%99%BA%E8%83%BD%E6%97%85%E8%A1%8C%E8%A7%84%E5%88%92%E5%8A%A9%E6%89%8B"><span class="nav-number">3.</span> <span class="nav-text">三、实战案例：智能旅行规划助手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E6%8F%8F%E8%BF%B0"><span class="nav-number">3.1.</span> <span class="nav-text">场景描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E7%BB%84%E4%BB%B6%E5%BA%94%E7%94%A8"><span class="nav-number">3.2.</span> <span class="nav-text">架构组件应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ReAct-%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B"><span class="nav-number">3.3.</span> <span class="nav-text">ReAct 推理过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E8%A1%8C%E7%A8%8B%E5%8D%95%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.4.</span> <span class="nav-text">最终行程单示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">四、总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">未完待续</p>
+  <div class="site-description" itemprop="description">个人博客 - 分享技术与生活</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/ai-blog/archives/">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/ai-blog/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/ai-blog/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lxx741.github.io/ai-blog/2026/03/10/AI%20Agent%20%E6%99%BA%E8%83%BD%E4%BD%93%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/ai-blog/images/avatar.gif">
+      <meta itemprop="name" content="未完待续">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="未完待续">
+      <meta itemprop="description" content="个人博客 - 分享技术与生活">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="AI Agent 智能体架构详解：从概念到实战 | 未完待续">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AI Agent 智能体架构详解：从概念到实战
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-03-10 17:30:00" itemprop="dateCreated datePublished" datetime="2026-03-10T17:30:00+08:00">2026-03-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-03-17 19:23:26" itemprop="dateModified" datetime="2026-03-17T19:23:26+08:00">2026-03-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/ai-blog/categories/%E6%8A%80%E6%9C%AF%EF%BC%8C%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">技术，人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p><strong>摘要</strong>：本文系统讲解 AI Agent 智能体的核心架构，包括 LLM 大模型、记忆模块、RAG、MCP、Tools、Skills、ReAct 等关键组件，并通过实战案例串联所有概念，帮助开发者快速掌握智能体开发要点。</p>
+</blockquote>
+<hr>
+<h2 id="一、什么是-AI-Agent？"><a href="#一、什么是-AI-Agent？" class="headerlink" title="一、什么是 AI Agent？"></a>一、什么是 AI Agent？</h2><p>AI Agent（智能体）是一个能够<strong>感知环境、进行推理、做出决策并执行行动</strong>的自主系统。它不仅仅是被动回答问题的聊天机器人，而是能够主动完成任务的智能实体。</p>
+<h3 id="核心架构"><a href="#核心架构" class="headerlink" title="核心架构"></a>核心架构</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────┐</span><br><span class="line">│              AI Agent 核心组件                   │</span><br><span class="line">│                                                 │</span><br><span class="line">│   用户输入 ──▶ LLM 大模型 ◀── 记忆模块           │</span><br><span class="line">│                  │                              │</span><br><span class="line">│                  ▼                              │</span><br><span class="line">│   RAG 知识库 ◀── ReAct 推理引擎 ──▶ MCP 连接器   │</span><br><span class="line">│                                    │            │</span><br><span class="line">│                  Tools 工具集 ◀────┘            │</span><br><span class="line">│                  Skills 技能库                  │</span><br><span class="line">│                      │                          │</span><br><span class="line">│                      ▼                          │</span><br><span class="line">│                  输出响应                       │</span><br><span class="line">└─────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、核心组件详解"><a href="#二、核心组件详解" class="headerlink" title="二、核心组件详解"></a>二、核心组件详解</h2><h3 id="2-1-LLM-大模型（大脑）"><a href="#2-1-LLM-大模型（大脑）" class="headerlink" title="2.1 LLM 大模型（大脑）"></a>2.1 LLM 大模型（大脑）</h3><p><strong>LLM（Large Language Model）</strong> 是 AI Agent 的”大脑”，负责理解自然语言、进行推理和生成响应。</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>语言理解</td>
+<td>理解用户输入的意图和上下文</td>
+</tr>
+<tr>
+<td>推理能力</td>
+<td>进行逻辑推理、数学计算、因果分析</td>
+</tr>
+<tr>
+<td>知识生成</td>
+<td>基于训练数据生成连贯的文本响应</td>
+</tr>
+<tr>
+<td>代码能力</td>
+<td>理解和生成编程代码</td>
+</tr>
+<tr>
+<td>多轮对话</td>
+<td>维持对话上下文，进行连续交互</td>
+</tr>
+</tbody></table>
+<p><strong>主流模型</strong>：GPT-4、Claude-3.5-Sonnet、Gemini Pro、Qwen-Max、Llama 3</p>
+<h3 id="2-2-记忆模块（经验）"><a href="#2-2-记忆模块（经验）" class="headerlink" title="2.2 记忆模块（经验）"></a>2.2 记忆模块（经验）</h3><p><strong>记忆模块</strong>使 AI Agent 能够记住过去的交互、用户偏好和重要信息，实现个性化和连续性的对话体验。</p>
+<p><strong>三种记忆类型</strong>：</p>
+<ul>
+<li><strong>短期记忆</strong>：对话历史、最近交互、上下文窗口</li>
+<li><strong>长期记忆</strong>：用户画像、重要事实、经验总结、向量存储</li>
+<li><strong>工作记忆</strong>：当前任务状态、中间推理结果、临时变量</li>
+</ul>
+<h3 id="2-3-RAG-检索增强生成（知识库）"><a href="#2-3-RAG-检索增强生成（知识库）" class="headerlink" title="2.3 RAG 检索增强生成（知识库）"></a>2.3 RAG 检索增强生成（知识库）</h3><p><strong>RAG（Retrieval-Augmented Generation）</strong> 结合信息检索和文本生成，使 LLM 能够访问外部知识库，生成更准确、更有依据的响应。</p>
+<p><strong>工作流程</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用户问题 → 生成检索查询 → 搜索知识库 → 返回相关片段</span><br><span class="line">         → 问题 + 检索结果 → LLM 增强生成 → 最终答案</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心优势</strong>：</p>
+<ul>
+<li>✅ 减少幻觉：基于真实文档生成</li>
+<li>✅ 知识更新：无需重新训练</li>
+<li>✅ 可追溯性：标注信息来源</li>
+<li>✅ 领域专精：快速适应特定领域</li>
+</ul>
+<h3 id="2-4-MCP-模型上下文协议（连接器）"><a href="#2-4-MCP-模型上下文协议（连接器）" class="headerlink" title="2.4 MCP 模型上下文协议（连接器）"></a>2.4 MCP 模型上下文协议（连接器）</h3><p><strong>MCP（Model Context Protocol）</strong> 是一个开放标准，用于连接 AI 应用与外部系统。它就像 AI 的”USB-C 接口”，提供标准化的方式连接数据源、工具和工作流。</p>
+<p><strong>核心能力</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>描述</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>资源读取</td>
+<td>访问外部数据源</td>
+<td>读取文件、查询数据库</td>
+</tr>
+<tr>
+<td>工具调用</td>
+<td>执行外部操作</td>
+<td>运行命令、调用 API</td>
+</tr>
+<tr>
+<td>提示模板</td>
+<td>预定义的工作流</td>
+<td>代码审查、数据分析</td>
+</tr>
+<tr>
+<td>实时订阅</td>
+<td>监听数据变化</td>
+<td>文件变更、消息通知</td>
+</tr>
+</tbody></table>
+<h3 id="2-5-Tools-工具（原子能力）"><a href="#2-5-Tools-工具（原子能力）" class="headerlink" title="2.5 Tools 工具（原子能力）"></a>2.5 Tools 工具（原子能力）</h3><p><strong>Tools</strong>是 AI Agent 可以调用的外部功能，使 Agent 能够执行超出纯文本生成的实际操作。</p>
+<p><strong>工具类型</strong>：</p>
+<ul>
+<li><strong>信息获取类</strong>：网络搜索、天气查询、新闻获取</li>
+<li><strong>执行操作类</strong>：文件操作、邮件发送、API 调用</li>
+<li><strong>计算分析类</strong>：代码执行、数据分析、数学计算</li>
+<li><strong>创意生成类</strong>：图像生成、语音合成、视频生成</li>
+</ul>
+<h3 id="2-6-Skills-技能（复合能力）"><a href="#2-6-Skills-技能（复合能力）" class="headerlink" title="2.6 Skills 技能（复合能力）"></a>2.6 Skills 技能（复合能力）</h3><p><strong>Skills</strong>是比工具更高级的能力封装，通常包含多个工具的协调使用、特定的工作流程和业务逻辑。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Tools（工具）</th>
+<th>Skills（技能）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>粒度</td>
+<td>原子操作</td>
+<td>复合工作流</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>单一功能</td>
+<td>多步骤协调</td>
+</tr>
+<tr>
+<td>抽象层级</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td>示例</td>
+<td>“搜索网页”</td>
+<td>“市场研究报告生成”</td>
+</tr>
+</tbody></table>
+<h3 id="2-7-ReAct-推理与行动（决策引擎）"><a href="#2-7-ReAct-推理与行动（决策引擎）" class="headerlink" title="2.7 ReAct 推理与行动（决策引擎）"></a>2.7 ReAct 推理与行动（决策引擎）</h3><p><strong>ReAct（Reasoning + Acting）</strong> 是一种将推理（Reasoning）和行动（Acting）结合的框架，使 LLM 能够生成推理轨迹并执行任务特定的行动。</p>
+<p><strong>执行循环</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">观察 → 思考 → 行动 → 新观察 → ... → 最终答案</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例轨迹</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">用户：特斯拉的 CEO 是谁？他之前创办过什么公司？</span><br><span class="line"></span><br><span class="line">Thought: 我需要先确认特斯拉的现任 CEO</span><br><span class="line">Action: search(&quot;特斯拉 CEO 2024&quot;)</span><br><span class="line">Observation: 特斯拉的 CEO 是埃隆·马斯克</span><br><span class="line"></span><br><span class="line">Thought: 现在我需要查找埃隆·马斯克创办过的公司</span><br><span class="line">Action: search(&quot;Elon Musk founded companies&quot;)</span><br><span class="line">Observation: 埃隆·马斯克创办了 Zip2、X.com(PayPal)、SpaceX、Tesla 等</span><br><span class="line"></span><br><span class="line">Thought: 我有了足够的信息来回答用户的问题</span><br><span class="line">Answer: 特斯拉的 CEO 是埃隆·马斯克。他之前创办过的公司包括...</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、实战案例：智能旅行规划助手"><a href="#三、实战案例：智能旅行规划助手" class="headerlink" title="三、实战案例：智能旅行规划助手"></a>三、实战案例：智能旅行规划助手</h2><h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>用户想要规划一次日本东京 5 日游，需要 AI 助手帮助完成：</p>
+<ul>
+<li>查询天气和最佳旅行时间</li>
+<li>推荐景点和行程</li>
+<li>预订酒店和餐厅</li>
+<li>生成详细行程单</li>
+</ul>
+<h3 id="架构组件应用"><a href="#架构组件应用" class="headerlink" title="架构组件应用"></a>架构组件应用</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户请求 → 记忆模块 (读取偏好) → RAG(检索旅游信息)</span><br><span class="line">    ↓</span><br><span class="line">天气工具 → 搜索工具 → 预订工具</span><br><span class="line">    ↓</span><br><span class="line">ReAct 推理最优方案 → 文档生成 → 交付行程单</span><br></pre></td></tr></table></figure>
+
+<h3 id="ReAct-推理过程"><a href="#ReAct-推理过程" class="headerlink" title="ReAct 推理过程"></a>ReAct 推理过程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Thought: 用户想要东京 5 日游规划，我需要先了解用户的偏好和预算</span><br><span class="line">Action: query_memory(&quot;用户旅行偏好&quot;)</span><br><span class="line">Observation: 用户喜欢历史文化景点和美食，预算中等</span><br><span class="line"></span><br><span class="line">Thought: 现在我需要查询东京的最佳旅行季节和天气</span><br><span class="line">Action: get_weather(&quot;Tokyo&quot;, forecast=&quot;7days&quot;)</span><br><span class="line">Observation: 未来 7 天天气良好，气温 15-22°C，适合旅游</span><br><span class="line"></span><br><span class="line">Thought: 我需要检索东京的热门景点和行程建议</span><br><span class="line">Action: search_knowledge_base(&quot;东京 5 日游 行程 推荐&quot;)</span><br><span class="line">Observation: 检索到 10 个相关行程方案</span><br><span class="line"></span><br><span class="line">Thought: 根据用户偏好，我应该重点推荐历史文化景点</span><br><span class="line">Action: filter_results(&quot;历史文化&quot;, &quot;美食&quot;)</span><br><span class="line">Observation: 筛选出 5 个符合偏好的行程方案</span><br><span class="line"></span><br><span class="line">Thought: 现在我有足够的信息来生成完整行程单</span><br><span class="line">Action: generate_itinerary(days=5, preferences=&quot;history,food&quot;)</span><br><span class="line">Observation: 生成 5 日游详细行程</span><br><span class="line"></span><br><span class="line">Answer: [交付完整行程单，包含每日安排、预订信息、实用贴士]</span><br></pre></td></tr></table></figure>
+
+<h3 id="最终行程单示例"><a href="#最终行程单示例" class="headerlink" title="最终行程单示例"></a>最终行程单示例</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 东京 5 日游行程单</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 📅 第一天：浅草文化之旅</span></span><br><span class="line"><span class="bullet">-</span> 上午：浅草寺、仲见世商店街</span><br><span class="line"><span class="bullet">-</span> 午餐：浅草今半 (寿喜烧)</span><br><span class="line"><span class="bullet">-</span> 下午：东京晴空塔</span><br><span class="line"><span class="bullet">-</span> 晚餐：晴空町餐厅街</span><br><span class="line"></span><br><span class="line"><span class="section">## 📅 第二天：现代东京探索</span></span><br><span class="line"><span class="bullet">-</span> 上午：明治神宫、原宿</span><br><span class="line"><span class="bullet">-</span> 午餐：表参道咖啡馆</span><br><span class="line"><span class="bullet">-</span> 下午：涩谷十字路口、SHIBUYA SKY</span><br><span class="line"><span class="bullet">-</span> 晚餐：涩谷居酒屋</span><br><span class="line"></span><br><span class="line"><span class="section">## 📅 第三天：历史与艺术</span></span><br><span class="line"><span class="bullet">-</span> 上午：皇居东御苑</span><br><span class="line"><span class="bullet">-</span> 午餐：东京站餐厅街</span><br><span class="line"><span class="bullet">-</span> 下午：teamLab Planets</span><br><span class="line"><span class="bullet">-</span> 晚餐：银座高级料理</span><br><span class="line"></span><br><span class="line"><span class="section">## 📋 预订信息</span></span><br><span class="line"><span class="bullet">-</span> 酒店：东京浅草酒店 (5 晚)</span><br><span class="line"><span class="bullet">-</span> 餐厅：已预订 3 家特色餐厅</span><br><span class="line"><span class="bullet">-</span> 交通：JR Pass 7 日券</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><p>AI Agent 是一个复杂而强大的系统，由多个核心组件协同工作：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>核心作用</th>
+<th>关键价值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LLM</strong></td>
+<td>大脑，理解与生成</td>
+<td>自然语言交互能力</td>
+</tr>
+<tr>
+<td><strong>记忆</strong></td>
+<td>存储与回忆</td>
+<td>个性化、连续性</td>
+</tr>
+<tr>
+<td><strong>RAG</strong></td>
+<td>知识增强</td>
+<td>准确、可追溯</td>
+</tr>
+<tr>
+<td><strong>MCP</strong></td>
+<td>标准化连接</td>
+<td>生态扩展性</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>原子能力</td>
+<td>执行实际操作</td>
+</tr>
+<tr>
+<td><strong>Skills</strong></td>
+<td>工作流封装</td>
+<td>高效完成任务</td>
+</tr>
+<tr>
+<td><strong>ReAct</strong></td>
+<td>推理框架</td>
+<td>透明、可解释</td>
+</tr>
+</tbody></table>
+<p>这些组件共同构成了一个能够理解、思考、行动的智能体系统，使 AI 从被动回答问题进化为主动完成任务的智能助手。</p>
+<hr>
+<p><em>本文基于《AI Agent 智能体架构详解》PDF 整理</em><br><em>版本：v1.0 | 2026 年 3 月</em></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/ai-blog/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/ai-blog/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%EF%BC%8CLLM/" rel="tag"># 人工智能，LLM</a>
+              <a href="/ai-blog/tags/RAG/" rel="tag"># RAG</a>
+              <a href="/ai-blog/tags/MCP/" rel="tag"># MCP</a>
+              <a href="/ai-blog/tags/ReAct/" rel="tag"># ReAct</a>
+              <a href="/ai-blog/tags/%E6%99%BA%E8%83%BD%E4%BD%93/" rel="tag"># 智能体</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ai-blog/2026/03/10/%E5%85%B7%E8%BA%AB%E6%99%BA%E8%83%BD%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%A0%94%E5%8F%91%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/" rel="prev" title="具身智能机器人研发完整指南：从入门到量产">
+                  <i class="fa fa-angle-left"></i> 具身智能机器人研发完整指南：从入门到量产
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/ai-blog/2026/03/10/AI%20%E5%AE%A1%E7%BE%8E%E4%B8%8E%E4%BA%BA%E7%B1%BB%E4%BB%B7%E5%80%BC%20-%20%E4%B8%80%E5%9C%BA%E6%B0%B8%E6%97%A0%E6%AD%A2%E5%A2%83%E7%9A%84%E8%BF%BD%E9%80%90/" rel="next" title="AI 审美与人类价值 - 一场永无止境的追逐">
+                  AI 审美与人类价值 - 一场永无止境的追逐 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">未完待续</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
